@@ -5,6 +5,6 @@ namespace DeutschHelp2
     class Word
     {
         public string Text { get; set; }
-        public List<Def> Defs { get; set; }
+        public List<Def> Defs { get; } = new List<Def>();
     }
 }

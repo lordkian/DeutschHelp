@@ -6,6 +6,6 @@ namespace DeutschHelp2
     {
         public string Deu { get; set; }
         public string Fa { get; set; }
-        public List<Example> Examples { get; set; }
+        public List<Example> Examples { get; } = new List<Example>();
     }
 }
