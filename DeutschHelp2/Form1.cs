@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using HtmlAgilityPack;
 
 namespace DeutschHelp2
 {
@@ -26,11 +27,12 @@ namespace DeutschHelp2
         private void button3_Click(object sender, EventArgs e)
         {
             words.Clear();
-            foreach (var item in textBox1.Text.Replace('\n',' ').Replace("\r","").Split(' '))
-                words.Add(new Word() { Text = item });
-            foreach (var item in words)
+            foreach (var item in textBox1.Text.Replace('\n', ' ').Replace("\r", "").Split(' '))
             {
-                var url = "https://wort.ir/woerterbuch/deutsch-persisch/" + item.Text;
+                var url = "https://wort.ir/woerterbuch/deutsch-persisch/" + item;
+                HtmlWeb htmlWeb = new HtmlWeb();
+                var html = htmlWeb.Load(url);
+                words.Add(html.DocumentNode.GetEncapsulatedData<Word>());
             }
         }
     }
