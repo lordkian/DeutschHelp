@@ -7,7 +7,7 @@ namespace DeutschHelp2
     [HasXPath]
     [DataContract]
     [DebuggerDisplay("{DeuEx} : {Fa}")]
-    class Example
+    public class Example
     {
 
 

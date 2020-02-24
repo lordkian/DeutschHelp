@@ -9,7 +9,7 @@ namespace DeutschHelp2
     [HasXPath]
     [DataContract]
     [DebuggerDisplay("Word={Text}")]
-    class Word
+    public class Word
     {
         [XPath("//*[@id='content-wrapper']/div/h1/text()")]
         [DataMember]

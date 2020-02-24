@@ -8,7 +8,7 @@ namespace DeutschHelp2
     [HasXPath]
     [DataContract]
     [DebuggerDisplay("{Deu} : {Fa}")]
-    class Def
+    public class Def
     {
         [XPath("/div[1]/div[@class='panel-title definition']/a/span[@class='de']")]
         [DataMember]
