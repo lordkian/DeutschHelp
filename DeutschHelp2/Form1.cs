@@ -32,11 +32,21 @@ namespace DeutschHelp2
                 var url = "https://wort.ir/woerterbuch/deutsch-persisch/" + item;
                 HtmlWeb htmlWeb = new HtmlWeb();
                 var html = htmlWeb.Load(url);
-                html.Save(@"C:\Users\Parsa\Desktop\t.html");
-                words.Add(html.DocumentNode.GetEncapsulatedData<Word>());
+                var html2 = htmlWeb.Load(url + "-2");
+                Word w1 = null, w2 = null;
+                try
+                {
+                    w1 = html.DocumentNode.GetEncapsulatedData<Word>();
+                }
+                catch (Exception) { }
+                try
+                {
+                    w2 = html2.DocumentNode.GetEncapsulatedData<Word>();
+                }
+                catch (Exception) { }
+                words.Add(Word.Merge(w1, w2));
             }
 
-            int a = 0;
         }
     }
 }
