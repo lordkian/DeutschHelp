@@ -15,11 +15,6 @@ namespace DeutschHelp2
             InitializeComponent();
         }
 
-        private void button1_Click(object sender, EventArgs e)
-        {
-
-        }
-
         private void button3_Click(object sender, EventArgs e)
         {
             words.Clear();
@@ -47,16 +42,34 @@ namespace DeutschHelp2
 
         private void button2_Click(object sender, EventArgs e)
         {
-            var ofd = new SaveFileDialog()
+            var sfd = new SaveFileDialog()
             {
-                Filter = "json object (*.json)",
+                Filter = "json object (*.json) | *.json",
                 InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.Desktop),
                 Title = "save all words"
             };
-            ofd.ShowDialog();
-            var sw = new StreamWriter(ofd.FileName);
+            sfd.ShowDialog();
+            var sw = new StreamWriter(sfd.FileName);
             sw.WriteLine(JsonConvert.SerializeObject(words, Formatting.Indented));
             sw.Close();
+        }
+        private void button1_Click(object sender, EventArgs e)
+        {
+            var ofd = new OpenFileDialog()
+            {
+                Filter = "json object (*.json) | *.json",
+                InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.Desktop),
+                Title = "load all words"
+            };
+            ofd.ShowDialog();
+            var sr = new StreamReader(ofd.FileName);
+            words.AddRange(JsonConvert.DeserializeObject<List<Word>>(sr.ReadToEnd()));
+            sr.Close();
+        }
+
+        private void button4_Click(object sender, EventArgs e)
+        {
+            int a = 0;
         }
     }
 }
