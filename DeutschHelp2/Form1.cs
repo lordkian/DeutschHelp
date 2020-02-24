@@ -18,7 +18,9 @@ namespace DeutschHelp2
         private void button3_Click(object sender, EventArgs e)
         {
             words.Clear();
-            foreach (var item in textBox1.Text.Replace('\n', ' ').Replace("\r", "").Split(' '))
+            var strs = textBox1.Text.Replace('\n', ' ').Replace("\r", "").Split(' ');
+            int i = 0;
+            foreach (var item in strs)
             {
                 var url = "https://wort.ir/woerterbuch/deutsch-persisch/" + item;
                 HtmlWeb htmlWeb = new HtmlWeb();
@@ -36,6 +38,8 @@ namespace DeutschHelp2
                 }
                 catch (Exception) { }
                 words.Add(Word.Merge(w1, w2));
+                i++;
+                progressBar1.Value = 100 * i / strs.Length;
             }
 
         }
