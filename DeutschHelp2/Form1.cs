@@ -32,8 +32,11 @@ namespace DeutschHelp2
                 var url = "https://wort.ir/woerterbuch/deutsch-persisch/" + item;
                 HtmlWeb htmlWeb = new HtmlWeb();
                 var html = htmlWeb.Load(url);
+                html.Save(@"C:\Users\Parsa\Desktop\t.html");
                 words.Add(html.DocumentNode.GetEncapsulatedData<Word>());
             }
+
+            int a = 0;
         }
     }
 }
