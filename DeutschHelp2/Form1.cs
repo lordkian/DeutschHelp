@@ -73,7 +73,7 @@ namespace DeutschHelp2
 
         private void button4_Click(object sender, EventArgs e)
         {
-            int a = 0;
+            new Show(words).Show();
         }
     }
 }
