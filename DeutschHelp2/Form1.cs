@@ -1,13 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.IO;
 using System.Windows.Forms;
 using HtmlAgilityPack;
+using Newtonsoft.Json;
 
 namespace DeutschHelp2
 {
@@ -47,6 +43,20 @@ namespace DeutschHelp2
                 words.Add(Word.Merge(w1, w2));
             }
 
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            var ofd = new SaveFileDialog()
+            {
+                Filter = "json object (*.json)",
+                InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.Desktop),
+                Title = "save all words"
+            };
+            ofd.ShowDialog();
+            var sw = new StreamWriter(ofd.FileName);
+            sw.WriteLine(JsonConvert.SerializeObject(words, Formatting.Indented));
+            sw.Close();
         }
     }
 }
