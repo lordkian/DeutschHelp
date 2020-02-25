@@ -24,8 +24,11 @@ namespace DeutschHelp2
         private void Show_Load(object sender, EventArgs e)
         {
             if (Words.Count == 0)
+            {
                 Close();
-            CurrentWord = Words[0]; 
+                return;
+            }
+            CurrentWord = Words[0];
             Show_Resize(sender, e);
         }
 
@@ -72,14 +75,14 @@ namespace DeutschHelp2
                     Left = 77 + button3.Left,
                     Text = item.Deu,
                     AutoSize = true,
-                    Font = label1.Font
+                    Font = label2.Font
                 };
                 var left = new Label()
                 {
                     Top = top,
                     Text = item.Fa,
                     AutoSize = true,
-                    Font = label1.Font
+                    Font = label2.Font
                 };
                 labels.Add(right);
                 Controls.Add(right);
