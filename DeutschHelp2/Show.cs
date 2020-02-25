@@ -18,5 +18,16 @@ namespace DeutschHelp2
             Words = words;
             InitializeComponent();
         }
+
+        private void Show_Load(object sender, EventArgs e)
+        {
+            Show_Resize(sender, e);
+        }
+
+        private void Show_Resize(object sender, EventArgs e)
+        {
+            button1.Top = (button5.Top + button5.Height - button3.Top) / 2 - 35;
+            button2.Top = button1.Top;
+        }
     }
 }
