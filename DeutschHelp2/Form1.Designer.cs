@@ -85,7 +85,6 @@
             this.textBox1.Name = "textBox1";
             this.textBox1.Size = new System.Drawing.Size(319, 278);
             this.textBox1.TabIndex = 4;
-            this.textBox1.Text = "Buch\r\nsprechen\r\ntoll\r\noft abholen";
             // 
             // progressBar1
             // 

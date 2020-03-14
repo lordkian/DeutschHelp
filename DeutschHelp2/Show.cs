@@ -17,7 +17,9 @@ namespace DeutschHelp2
         List<Label> labels = new List<Label>();
         public Show(List<Word> words)
         {
-            Words = words;
+            Words = words.Distinct().ToList();
+            if (Words.Contains(null))
+                Words.Remove(null);
             InitializeComponent();
         }
 
