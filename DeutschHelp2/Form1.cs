@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using HtmlAgilityPack;
 using Newtonsoft.Json;
@@ -18,7 +19,8 @@ namespace DeutschHelp2
         private void button3_Click(object sender, EventArgs e)
         {
             words.Clear();
-            var strs = textBox1.Text.Replace('\n', ' ').Replace("\r", "").Split(' ');
+            var str = Regex.Replace(textBox1.Text, "\\s+", "").Replace("\r", "").Replace(".", "").Replace(",", "");
+            var strs = str.Split(' ');
             int i = 0;
             foreach (var item in strs)
             {
