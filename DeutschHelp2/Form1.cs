@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Net;
-using System.Text;
+using System.Linq;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using HtmlAgilityPack;
@@ -13,6 +12,7 @@ namespace DeutschHelp2
     public partial class Form1 : Form
     {
         List<Word> words = new List<Word>();
+        SuggestionCrawler suggestionCrawler = new SuggestionCrawler();
         public Form1()
         {
             InitializeComponent();
@@ -21,29 +21,29 @@ namespace DeutschHelp2
         private void button3_Click(object sender, EventArgs e)
         {
             words.Clear();
-            var str = Regex.Replace(textBox1.Text, "\\s+", "").Replace("\r", "").Replace(".", "").Replace(",", "");
-            var strs = str.Split(' ');
+            var str = Regex.Replace(textBox1.Text, "\\s+", " ").Replace("\r", "").Replace(".", "").Replace(",", "");
+            var strs = str.Split(' ').Where(d => d.Length > 0).Distinct().ToList();
             int i = 0;
+            suggestionCrawler.GetCookie();
             foreach (var item in strs)
             {
-                var url = "https://wort.ir/woerterbuch/deutsch-persisch/" + item;
-                HtmlWeb htmlWeb = new HtmlWeb();
-                var html = htmlWeb.Load(url);
-                var html2 = htmlWeb.Load(url + "-2");
-                Word w1 = null, w2 = null;
-                try
+                var slist = suggestionCrawler.GetSuggestions(item);
+                var wlist = new List<Word>();
+                foreach (var item2 in slist)
                 {
-                    w1 = html.DocumentNode.GetEncapsulatedData<Word>();
+                    var url = "https://wort.ir" + item2.full_slug;
+                    HtmlWeb htmlWeb = new HtmlWeb();
+                    var html = htmlWeb.Load(url);
+                    try
+                    {
+                        wlist.Add(html.DocumentNode.GetEncapsulatedData<Word>());
+                    }
+                    catch (Exception) { }
                 }
-                catch (Exception) { }
-                try
-                {
-                    w2 = html2.DocumentNode.GetEncapsulatedData<Word>();
-                }
-                catch (Exception) { }
-                words.Add(Word.Merge(w1, w2));
+                if (wlist.Count > 0)
+                    words.Add(Word.Merge(wlist));
                 i++;
-                progressBar1.Value = 100 * i / strs.Length;
+                progressBar1.Value = 100 * i / strs.Count;
             }
 
         }
