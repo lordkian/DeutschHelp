@@ -6,6 +6,7 @@ using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Web.Script.Serialization;
 
 namespace DeutschHelp2
 {
@@ -63,7 +64,8 @@ namespace DeutschHelp2
             postResponse.Close();
 
             // Deserialize response
-            List<Suggestion> postResult = JsonSerializer.Deserialize<List<Suggestion>>(postResponseString);
+            var serializer = new JavaScriptSerializer();
+            List<Suggestion> postResult = serializer.Deserialize<List<Suggestion>>(postResponseString);
 
             return postResult;
         }
