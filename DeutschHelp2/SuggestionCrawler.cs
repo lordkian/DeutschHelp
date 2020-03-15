@@ -1,18 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using System.Web.Script.Serialization;
 
 namespace DeutschHelp2
 {
     class SuggestionCrawler
     {
-        byte[] data;
+        string getToken;
         HttpWebResponse getResponse;
         public void GetCookie()
         {
@@ -26,15 +23,17 @@ namespace DeutschHelp2
             // Get Token
             string getResponseString = new StreamReader(getResponse.GetResponseStream()).ReadToEnd();
             string tokenPattern = "<body data-vtn=\"(\\w+)\"";
-            string getToken = Regex.Match(getResponseString, tokenPattern).Groups[1].Value;
+            getToken = Regex.Match(getResponseString, tokenPattern).Groups[1].Value;
 
             // Generate Body
-            string word = "buc";
-            string postData = $"search={word}&_token={getToken}";
-            data = Encoding.ASCII.GetBytes(postData);
+
+
         }
-        public List<Suggestion> GetData()
+        public List<Suggestion> GetSuggestions(string word)
         {
+            string postData = $"search={word}&_token={getToken}";
+            byte[] data = Encoding.ASCII.GetBytes(postData);
+
             // Generate Post Request
             HttpWebRequest postRequest = (HttpWebRequest)WebRequest.Create("https://wort.ir/woerterbuch/ac");
 
@@ -52,7 +51,6 @@ namespace DeutschHelp2
             using (var stream = postRequest.GetRequestStream())
             {
                 stream.Write(data, 0, data.Length);
-
             }
 
             // Get Response
