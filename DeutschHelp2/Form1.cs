@@ -74,20 +74,22 @@ namespace DeutschHelp2
             var sr = new StreamReader(ofd.FileName);
             words.Clear();
             textBox1.Text = "";
+            var str = sr.ReadToEnd();
+            sr.Close();
 
-            var obj = JsonConvert.DeserializeObject(sr.ReadToEnd());
-            if (obj is List<Word>)
-                words.AddRange(obj as List<Word>);
-            else if (obj is Serializable)
+            try
             {
-                var s = obj as Serializable;
+                var s = JsonConvert.DeserializeObject<Serializable>(str);
                 if (s.Version == 1.1)
                 {
                     words.AddRange(s.Words);
                     textBox1.Text = s.Text;
                 }
             }
-            sr.Close();
+            catch (Exception)
+            {
+                words.AddRange(JsonConvert.DeserializeObject<List<Word>>(str));
+            }
         }
 
         private void button4_Click(object sender, EventArgs e)
