@@ -58,7 +58,7 @@ namespace DeutschHelp2
             };
             sfd.ShowDialog();
             var sw = new StreamWriter(sfd.FileName);
-            sw.WriteLine(JsonConvert.SerializeObject(words, Formatting.Indented));
+            sw.WriteLine(JsonConvert.SerializeObject(new Serializable() { Text = textBox1.Text, Words = words, Version = 1.1 }, Formatting.Indented));
             sw.Close();
         }
         private void button1_Click(object sender, EventArgs e)
@@ -70,8 +70,23 @@ namespace DeutschHelp2
                 Title = "load all words"
             };
             ofd.ShowDialog();
+
             var sr = new StreamReader(ofd.FileName);
-            words.AddRange(JsonConvert.DeserializeObject<List<Word>>(sr.ReadToEnd()));
+            words.Clear();
+            textBox1.Text = "";
+
+            var obj = JsonConvert.DeserializeObject(sr.ReadToEnd());
+            if (obj is List<Word>)
+                words.AddRange(obj as List<Word>);
+            else if (obj is Serializable)
+            {
+                var s = obj as Serializable;
+                if (s.Version == 1.1)
+                {
+                    words.AddRange(s.Words);
+                    textBox1.Text = s.Text;
+                }
+            }
             sr.Close();
         }
 

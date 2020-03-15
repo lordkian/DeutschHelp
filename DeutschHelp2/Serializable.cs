@@ -6,6 +6,6 @@ namespace DeutschHelp2
     {
         public List<Word> Words { get; set; }
         public string Text { get; set; }
-        public double Version { get; set; } = 1.1;
+        public double Version { get; set; } 
     }
 }
