@@ -116,7 +116,7 @@
             // 
             this.label2.AutoSize = true;
             this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label2.Location = new System.Drawing.Point(252, 106);
+            this.label2.Location = new System.Drawing.Point(467, 17);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(51, 20);
             this.label2.TabIndex = 7;
@@ -139,6 +139,7 @@
             this.Name = "Show";
             this.Text = "Show";
             this.Load += new System.EventHandler(this.Show_Load);
+            this.Paint += new System.Windows.Forms.PaintEventHandler(this.Show_Paint);
             this.Resize += new System.EventHandler(this.Show_Resize);
             this.ResumeLayout(false);
             this.PerformLayout();
