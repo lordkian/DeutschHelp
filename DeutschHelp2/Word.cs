@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Runtime.Serialization;
 using HtmlAgilityPack;
 
@@ -18,6 +19,17 @@ namespace DeutschHelp2
         [XPath("//*[@id='accordion']/div")]
         [DataMember]
         public List<Def> Defs { get; set; } = new List<Def>();
+        public static Word Merge(IEnumerable<Word> list)
+        {
+            var w = new Word() { Text = list.First().Text };
+            foreach (var item in list)
+            {
+                if (item.Text != w.Text)
+                    throw new Exception("Not the same word");
+                w.Defs.AddRange(item.Defs);
+            }
+            return w;
+        }
         public static Word Merge(Word w1, Word w2)
         {
             if (w2 == null)
