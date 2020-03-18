@@ -1,9 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using Newtonsoft.Json;
+using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Web.Script.Serialization;
 
 namespace DeutschHelp
 {
@@ -62,8 +62,7 @@ namespace DeutschHelp
             postResponse.Close();
 
             // Deserialize response
-            var serializer = new JavaScriptSerializer();
-            List<Suggestion> postResult = serializer.Deserialize<List<Suggestion>>(postResponseString);
+            List<Suggestion> postResult = JsonConvert.DeserializeObject<List<Suggestion>>(postResponseString);//serializer.Deserialize<List<Suggestion>>(postResponseString);
 
             return postResult;
         }

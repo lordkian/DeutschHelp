@@ -11,15 +11,13 @@ namespace DeutschHelp
 {
     public partial class Show : Form
     {
-        Word CurrentWord = null;
-        List<Word> Words;
+        WordPackung currentWordPackung = null;
+        List<WordPackung> wordPackungen;
         List<Label> labels = new List<Label>();
         List<int> lineTops = new List<int>();
-        public Show(List<Word> words)
+        public Show(List<WordPackung> wordPackungen)
         {
-            Words = words.Distinct().ToList();
-            if (Words.Contains(null))
-                Words.Remove(null);
+            this.wordPackungen = wordPackungen;
             InitializeComponent();
         }
         private void ShowWord()
@@ -31,63 +29,81 @@ namespace DeutschHelp
             }
 
             labels.Clear();
-            label1.Text = CurrentWord.Text;
+            label1.Text = currentWordPackung.Text;
             int top = button3.Top + button3.Height + 7;
             lineTops.Clear();
 
-            foreach (var item in CurrentWord.Defs)
+            foreach (var item in currentWordPackung.Words)
             {
-                var right = new Label()
+
+                var center = new Label()
                 {
                     Top = top,
-                    Left = 77 + button3.Left,
-                    Text = item.Deu,
+                    Text = item.Text,
+                    Left = label1.Left,
                     AutoSize = true,
                     Font = label2.Font
                 };
-                var left = new Label()
-                {
-                    Top = top,
-                    Text = item.Fa,
-                    AutoSize = true,
-                    Font = label2.Font
-                };
-                labels.Add(right);
-                Controls.Add(right);
-                labels.Add(left);
-                Controls.Add(left);
-                left.Left = button2.Left - 7 - left.Width;
-                top += 7 + right.Height;
+                labels.Add(center);
+                Controls.Add(center);
+                top += 7 + center.Height;
                 lineTops.Add(top - 3);
+                foreach (var item2 in item.Defs)
+                {
+                    var right = new Label()
+                    {
+                        Top = top,
+                        Left = 77 + button3.Left,
+                        Text = item2.Deu,
+                        AutoSize = true,
+                        Font = label2.Font
+                    };
+                    var left = new Label()
+                    {
+                        Top = top,
+                        Text = item2.Fa,
+                        AutoSize = true,
+                        Font = label2.Font
+                    };
+                    labels.Add(right);
+                    Controls.Add(right);
+                    labels.Add(left);
+                    Controls.Add(left);
+                    left.Left = button2.Left - 7 - left.Width;
+                    top += 7 + right.Height;
+                    lineTops.Add(top - 3);
+                }
+                top += 3;
             }
+
             Invalidate();
         }
         private void button2_Click(object sender, EventArgs e)
         {
-            int i = Words.IndexOf(CurrentWord) + 1;
-            if (Words.Count == i)
+            int i = wordPackungen.IndexOf(currentWordPackung) + 1;
+            if (wordPackungen.Count == i)
                 i = 0;
-            CurrentWord = Words[i];
+            currentWordPackung = wordPackungen[i];
             ShowWord();
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
-            int i = Words.IndexOf(CurrentWord) - 1;
+            int i = wordPackungen.IndexOf(currentWordPackung) - 1;
             if (-1 == i)
-                i = Words.Count - 1;
-            CurrentWord = Words[i];
+                i = wordPackungen.Count - 1;
+            currentWordPackung = wordPackungen[i];
             ShowWord();
         }
 
         private void Show_Load(object sender, EventArgs e)
         {
-            if (Words.Count == 0)
+            if (wordPackungen.Count == 0)
             {
                 Close();
                 return;
             }
-            CurrentWord = Words[0];
+            currentWordPackung = wordPackungen[0];
             Show_Resize(sender, e);
         }
 
@@ -95,8 +111,8 @@ namespace DeutschHelp
         {
             button1.Top = (button5.Top + button5.Height - button3.Top) / 2 - 35;
             button2.Top = button1.Top;
-            ShowWord();
             label1.Left = (button4.Left + button4.Width - button3.Left) / 2 - label1.Width / 2;
+            ShowWord();
         }
 
         private void Show_Paint(object sender, PaintEventArgs e)

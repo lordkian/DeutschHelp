@@ -13,6 +13,7 @@ namespace DeutschHelp
     public partial class Form1 : Form
     {
         List<Word> words = new List<Word>();
+        List<WordPackung> wordPackungen = new List<WordPackung>();
         SuggestionCrawler suggestionCrawler = new SuggestionCrawler();
         public Form1()
         {
@@ -22,6 +23,7 @@ namespace DeutschHelp
         private void button1_Click(object sender, EventArgs e)
         {
             words.Clear();
+            wordPackungen.Clear();
             var str = Regex.Replace(textBox1.Text, "\\s+", " ").Replace("\r", "").Replace(".", "").Replace(",", "");
             var strs = str.Split(' ').Where(d => d.Length > 0).Distinct().ToList();
             int i = 0;
@@ -42,6 +44,8 @@ namespace DeutschHelp
                     catch (Exception) { }
                 }
                 if (wlist.Count > 0)
+                    wordPackungen.Add(new WordPackung() { Text = item, Words = wlist });
+                if (wlist.Count > 0)
                     words.Add(Word.Merge(wlist));
                 i++;
                 progressBar1.Value = 100 * i / strs.Count;
@@ -58,7 +62,7 @@ namespace DeutschHelp
             };
             sfd.ShowDialog();
             var sw = new StreamWriter(sfd.FileName);
-            sw.WriteLine(JsonConvert.SerializeObject(new Serializable() { Text = textBox1.Text, Words = words, Version = 1.1 }, Formatting.Indented));
+            sw.WriteLine(JsonConvert.SerializeObject(new Serializable() { Text = textBox1.Text, WordPackungen = wordPackungen, Version = 1.2 }, Formatting.Indented));
             sw.Close();
         }
 
@@ -83,19 +87,26 @@ namespace DeutschHelp
                 var s = JsonConvert.DeserializeObject<Serializable>(str);
                 if (s.Version == 1.1)
                 {
-                    words.AddRange(s.Words);
+                    foreach (var item in s.Words)
+                        wordPackungen.Add(new WordPackung() { Text = item.Text, Words = new List<Word>() { item } });
                     textBox1.Text = s.Text;
+                }
+                else if (s.Version == 1.2)
+                {
+                    textBox1.Text = s.Text;
+                    wordPackungen.AddRange(s.WordPackungen);
                 }
             }
             catch (Exception)
             {
-                words.AddRange(JsonConvert.DeserializeObject<List<Word>>(str));
+                foreach (var item in JsonConvert.DeserializeObject<List<Word>>(str))
+                    wordPackungen.Add(new WordPackung() { Text = item.Text, Words = new List<Word>() { item } });
             }
         }
 
         private void button2_Click(object sender, EventArgs e)
         {
-            new Show(words).Show();
+            new Show(wordPackungen).Show();
         }
     }
 }
