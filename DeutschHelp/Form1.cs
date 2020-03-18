@@ -54,13 +54,20 @@ namespace DeutschHelp
 
         private void button3_Click(object sender, EventArgs e)
         {
+            if (wordPackungen.Count == 0)
+            {
+                MessageBox.Show("There is no word to show.");
+                return;
+            }
             var sfd = new SaveFileDialog()
             {
                 Filter = "json object (*.json) | *.json",
                 InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.Desktop),
                 Title = "save all words"
             };
-            sfd.ShowDialog();
+            var res = sfd.ShowDialog();
+            if (res == DialogResult.Cancel)
+                return;
             var sw = new StreamWriter(sfd.FileName);
             sw.WriteLine(JsonConvert.SerializeObject(new Serializable() { Text = textBox1.Text, WordPackungen = wordPackungen, Version = 1.2 }, Formatting.Indented));
             sw.Close();
@@ -74,8 +81,9 @@ namespace DeutschHelp
                 InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.Desktop),
                 Title = "load all words"
             };
-            ofd.ShowDialog();
-
+            var res = ofd.ShowDialog();
+            if (res == DialogResult.Cancel)
+                return;
             var sr = new StreamReader(ofd.FileName);
             words.Clear();
             textBox1.Text = "";
@@ -106,6 +114,11 @@ namespace DeutschHelp
 
         private void button2_Click(object sender, EventArgs e)
         {
+            if (wordPackungen.Count == 0)
+            {
+                MessageBox.Show("There is no word to show.");
+                return;
+            }
             new Show(wordPackungen).Show();
         }
     }
