@@ -24,8 +24,6 @@ namespace DeutschHelp2
             var w = new Word() { Text = list.First().Text };
             foreach (var item in list)
             {
-                if (item.Text != w.Text)
-                    throw new Exception("Not the same word");
                 w.Defs.AddRange(item.Defs);
             }
             return w;
@@ -36,8 +34,6 @@ namespace DeutschHelp2
                 return w1;
             if (w1 == null)
                 return w2;
-            if (w1.Text != w2.Text)
-                throw new Exception("Not the same word");
             var w = new Word() { Text = w1.Text };
             w.Defs.AddRange(w1.Defs);
             w.Defs.AddRange(w2.Defs);
