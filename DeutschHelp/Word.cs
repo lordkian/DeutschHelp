@@ -5,7 +5,7 @@ using System.Linq;
 using System.Runtime.Serialization;
 using HtmlAgilityPack;
 
-namespace DeutschHelp2
+namespace DeutschHelp
 {
     [HasXPath]
     [DataContract]

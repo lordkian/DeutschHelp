@@ -71,6 +71,7 @@
     <Compile Include="Show.Designer.cs">
       <DependentUpon>Show.cs</DependentUpon>
     </Compile>
+    <Compile Include="Suggestion.cs" />
     <Compile Include="SuggestionCrawler.cs" />
     <Compile Include="Word.cs" />
     <EmbeddedResource Include="Form1.resx">

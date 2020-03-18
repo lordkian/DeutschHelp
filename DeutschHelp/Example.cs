@@ -2,7 +2,7 @@
 using System.Diagnostics;
 using System.Runtime.Serialization;
 
-namespace DeutschHelp2
+namespace DeutschHelp
 {
     [HasXPath]
     [DataContract]

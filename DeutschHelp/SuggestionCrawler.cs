@@ -5,7 +5,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Web.Script.Serialization;
 
-namespace DeutschHelp2
+namespace DeutschHelp
 {
     class SuggestionCrawler
     {

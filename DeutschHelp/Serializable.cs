@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace DeutschHelp2
+namespace DeutschHelp
 {
     public class Serializable
     {
