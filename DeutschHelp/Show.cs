@@ -14,37 +14,51 @@ namespace DeutschHelp
         WordPackung currentWordPackung = null;
         List<WordPackung> wordPackungen;
         List<Label> labels = new List<Label>();
+        List<Label> leftLabels = new List<Label>();
+        List<Label> rightLabels = new List<Label>();
+        List<Label> centerLabels = new List<Label>();
         List<int> lineTops = new List<int>();
         public Show(List<WordPackung> wordPackungen)
         {
             this.wordPackungen = wordPackungen;
             InitializeComponent();
         }
+        private void SortWord()
+        {
+            foreach (var item in rightLabels)
+                item.Left = 77 + button3.Left;
+            foreach (var item in centerLabels)
+                item.Left = label1.Left + label1.Width / 2 - item.Width / 2;
+            foreach (var item in leftLabels)
+                item.Left = button2.Left - 7 - item.Width;
+            Invalidate();
+        }
         private void ShowWord()
         {
-            foreach (var item in labels)
+            while (labels.Count > 0)
             {
+                var item = labels[0];
                 Controls.Remove(item);
                 item.Dispose();
+                if (labels.Contains(item))
+                    labels.Remove(item);
             }
-
-            labels.Clear();
             label1.Text = currentWordPackung.Text;
             int top = button3.Top + button3.Height + 7;
             lineTops.Clear();
 
             foreach (var item in currentWordPackung.Words)
             {
-
                 var center = new Label()
                 {
                     Top = top,
                     Text = item.Text,
-                    Left = label1.Left,
                     AutoSize = true,
                     Font = label2.Font
                 };
+                center.Left = label1.Left + label1.Width / 2 - center.Width / 2;
                 labels.Add(center);
+                centerLabels.Add(center);
                 Controls.Add(center);
                 top += 7 + center.Height;
                 lineTops.Add(top - 3);
@@ -67,15 +81,16 @@ namespace DeutschHelp
                     };
                     labels.Add(right);
                     Controls.Add(right);
+                    rightLabels.Add(right);
                     labels.Add(left);
                     Controls.Add(left);
+                    leftLabels.Add(left);
                     left.Left = button2.Left - 7 - left.Width;
                     top += 7 + right.Height;
                     lineTops.Add(top - 3);
                 }
                 top += 3;
             }
-
             Invalidate();
         }
         private void button2_Click(object sender, EventArgs e)
@@ -86,7 +101,6 @@ namespace DeutschHelp
             currentWordPackung = wordPackungen[i];
             ShowWord();
         }
-
         private void button1_Click(object sender, EventArgs e)
         {
             int i = wordPackungen.IndexOf(currentWordPackung) - 1;
@@ -95,7 +109,6 @@ namespace DeutschHelp
             currentWordPackung = wordPackungen[i];
             ShowWord();
         }
-
         private void Show_Load(object sender, EventArgs e)
         {
             if (wordPackungen.Count == 0)
@@ -104,7 +117,14 @@ namespace DeutschHelp
                 return;
             }
             currentWordPackung = wordPackungen[0];
+            ShowWord();
             Show_Resize(sender, e);
+        }
+        private void Show_Paint(object sender, PaintEventArgs e)
+        {
+            var pen = new Pen(Color.Red, 1);
+            foreach (var item in lineTops)
+                e.Graphics.DrawLine(pen, button2.Left - 7, item, button1.Left + button1.Width + 7, item);
         }
 
         private void Show_Resize(object sender, EventArgs e)
@@ -112,14 +132,7 @@ namespace DeutschHelp
             button1.Top = (button5.Top + button5.Height - button3.Top) / 2 - 35;
             button2.Top = button1.Top;
             label1.Left = (button4.Left + button4.Width - button3.Left) / 2 - label1.Width / 2;
-            ShowWord();
-        }
-
-        private void Show_Paint(object sender, PaintEventArgs e)
-        {
-            var pen = new Pen(Color.Red, 1);
-            foreach (var item in lineTops)
-                e.Graphics.DrawLine(pen, button2.Left - 7, item, button1.Left + button1.Width + 7, item);
+            SortWord();
         }
     }
 }
