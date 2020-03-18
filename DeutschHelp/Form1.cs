@@ -121,5 +121,10 @@ namespace DeutschHelp
             }
             new Show(wordPackungen).Show();
         }
+
+        public void ChangeProgressBarPercentage(int percentage)
+        {
+            progressBar1.Invoke(new Action(() => { progressBar1.Value = percentage; }));
+        }
     }
 }
