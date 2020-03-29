@@ -14,10 +14,9 @@ namespace DeutschHelp
 {
     public partial class Form1 : Form
     {
-        List<Word> word = new List<Word>();
+        private readonly object wordPackungenLock = new object();
+        private readonly object percentLock = new object();
         List<WordPackung> wordPackungen = new List<WordPackung>();
-        SuggestionCrawler suggestionCrawler = new SuggestionCrawler();
-        Task task;
         CancellationTokenSource tokenSource2;
         public Form1()
         {
@@ -25,9 +24,7 @@ namespace DeutschHelp
         }
         private void button1_Click(object sender, EventArgs e)
         {
-            var str = Regex.Replace(textBox1.Text, "\\s+", " ").Replace("\r", "").Replace(".", "").Replace(",", "");
-            var strs = str.Split(' ').Where(d => d.Length > 0).Distinct().ToList();
-            if (strs.Count == 0)
+            if (Regex.Replace(textBox1.Text.Replace(".", " ").Replace(",", " ").Replace("\r", " "), "\\s+", "").Length == 0)
             {
                 MessageBox.Show("There is no word to show.");
                 return;
@@ -44,48 +41,84 @@ namespace DeutschHelp
 
             tokenSource2 = new CancellationTokenSource();
             CancellationToken ct = tokenSource2.Token;
-            task = Task.Run(() =>
-             {
-                 var str = textBox1.Text.Replace(".", " ").Replace(",", " ");
-                 str = Regex.Replace(str, "\\s+", " ").Replace("\r", "");
-                 var strs = str.Split(' ').Where(d => d.Length > 0).Distinct().ToList();
-                 int i = 0;
-                 suggestionCrawler.GetCookie();
-                 foreach (var item in strs)
-                 {
-                     if (ct.IsCancellationRequested)
-                     {
-                         Invoke(new Action(Finish));
-                         ct.ThrowIfCancellationRequested();
-                         return;
-                     }
-                     try
-                     {
-                         var slist = suggestionCrawler.GetSuggestions(item);
-                         var wlist = new List<Word>();
-                         foreach (var item2 in slist)
-                         {
-                             var url = "https://wort.ir" + item2.full_slug;
-                             HtmlWeb htmlWeb = new HtmlWeb();
-                             var html = htmlWeb.Load(url);
-                             try
-                             {
-                                 wlist.Add(html.DocumentNode.GetEncapsulatedData<Word>());
-                             }
-                             catch (Exception) { }
-                         }
-                         if (wlist.Count > 0)
-                             wordPackungen.Add(new WordPackung() { Text = item, Words = wlist });
-                     }
-                     catch (Exception e)
-                     {
-                         int j = 0;
-                     }
-                     i++;
-                     ChangeProgressBarPercentage(100 * i / strs.Count);
-                 }
-                 Invoke(new Action(Finish));
-             }, tokenSource2.Token);
+            Task.Run(() => Map(textBox1.Text))
+                .ContinueWith(t => Process(t.Result, ct))
+                .ContinueWith(t => Reduce(t.Result));
+        }
+        private List<string> Map(string text)
+        {
+            return Regex.Replace(
+                text.Replace(".", " ").Replace(",", " ").Replace("\r", " ")
+                , "\\s+", " ")
+                .Split().ToList();
+        }
+        private List<string> Reduce(List<string> words)
+        {
+            wordPackungen.Sort((s1,s2) => { return words.IndexOf(s1.Text).CompareTo(words.IndexOf(s2.Text)); });
+            Finish();
+            return words;
+        }
+        private List<string> Process(List<string> words, CancellationToken cancellationToken)
+        {
+            int stat = 0;
+            ChangeProgressBarPercentage(0);
+            var suggestionCrawler = new SuggestionCrawler();
+            suggestionCrawler.GetCookie();
+            if (cancellationToken.IsCancellationRequested)
+            {
+                Finish();
+                cancellationToken.ThrowIfCancellationRequested();
+            }
+            words.ForEach((word) =>
+            {
+                Task.Factory.StartNew(() =>
+                {
+                    var wp = ProcessString(word, cancellationToken, suggestionCrawler);
+                    lock (wordPackungenLock)
+                    {
+                        if (wp != null)
+                            wordPackungen.Add(wp);
+                    }
+                    lock (percentLock)
+                    {
+                        stat++;
+                        ChangeProgressBarPercentage(100 * stat / words.Count);
+                    }
+                }, cancellationToken: cancellationToken, creationOptions: TaskCreationOptions.AttachedToParent | TaskCreationOptions.LongRunning, scheduler: TaskScheduler.Default);
+            });
+            return words;
+        }
+        private WordPackung ProcessString(string text, CancellationToken cancellationToken, SuggestionCrawler suggestionCrawler)
+        {
+            if (cancellationToken.IsCancellationRequested)
+            {
+                Finish();
+                cancellationToken.ThrowIfCancellationRequested();
+            }
+            var slist = suggestionCrawler.GetSuggestions(text);
+            if (slist == null)
+                return null;
+            var wlist = new List<Word>();
+            foreach (var item2 in slist)
+            {
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    Finish();
+                    cancellationToken.ThrowIfCancellationRequested();
+                }
+                var url = "https://wort.ir" + item2.full_slug;
+                HtmlWeb htmlWeb = new HtmlWeb();
+                var html = htmlWeb.Load(url);
+                try
+                {
+                    wlist.Add(html.DocumentNode.GetEncapsulatedData<Word>());
+                }
+                catch (Exception) { }
+            }
+            if (wlist.Count > 0)
+                return new WordPackung() { Text = text, Words = wlist };
+            else
+                return null;
         }
         private void button1_Click2(object sender, EventArgs e)
         {
@@ -93,12 +126,18 @@ namespace DeutschHelp
         }
         public void Finish()
         {
-            button2.Enabled = true;
-            button3.Enabled = true;
-            button4.Enabled = true;
-            button1.Text = "Download";
-            button1.Click -= button1_Click2;
-            button1.Click += button1_Click;
+            if (InvokeRequired)
+                Invoke(new Action(Finish));
+            else
+            {
+                button2.Enabled = true;
+                button3.Enabled = true;
+                button4.Enabled = true;
+                button1.Text = "Download";
+                button1.Click -= button1_Click2;
+                button1.Click += button1_Click;
+                progressBar1.Value = 0;
+            }
         }
         private void button3_Click(object sender, EventArgs e)
         {
