@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -21,6 +22,7 @@ namespace DeutschHelp
         public Form1()
         {
             InitializeComponent();
+            ServicePointManager.DefaultConnectionLimit = 16;
         }
         private void button1_Click(object sender, EventArgs e)
         {
